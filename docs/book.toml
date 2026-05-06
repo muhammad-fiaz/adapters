@@ -10,4 +10,3 @@ description = "High-performance, schema-driven data validation, serialization, d
 git-repository-url = "https://github.com/muhammad-fiaz/adapters"
 edit-url-template = "https://github.com/muhammad-fiaz/adapters/edit/main/docs/{path}"
 preferred-dark-theme = "navy"
-google-analytics = "G-6BVYCRK57P"
