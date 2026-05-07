@@ -1,4 +1,6 @@
 <div align="center">
+<h1>Adapters</h1>
+
 <img src="https://github.com/user-attachments/assets/565fc3dc-dd2c-47a6-bab6-2f545c551f26" alt="adapters logo" width="400" />
 
 <a href="https://muhammad-fiaz.github.io/adapters/"><img src="https://img.shields.io/badge/docs-muhammad--fiaz.github.io-blue" alt="Documentation"></a>
