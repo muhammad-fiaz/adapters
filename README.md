@@ -1,5 +1,5 @@
 <div align="center">
-<img alt="adaptes thumbnail" src="https://github.com/user-attachments/assets/5724cfd0-f939-4cc4-8a60-a51a60200e4b" />
+<img alt="adaptes thumbnail" src="https://github.com/user-attachments/assets/931b94df-90a4-4d03-a152-50bf56fdb398" />
 
 <a href="https://muhammad-fiaz.github.io/adapters/"><img src="https://img.shields.io/badge/docs-muhammad--fiaz.github.io-blue" alt="Documentation"></a>
 <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Rust-Edition%202024-orange.svg?logo=rust" alt="Rust Edition"></a>
