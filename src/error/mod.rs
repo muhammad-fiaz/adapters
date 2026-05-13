@@ -115,7 +115,9 @@ pub struct SerializationError {
 impl SerializationError {
     /// Constructs a new `SerializationError`.
     pub fn new(message: impl Into<String>) -> Self {
-        Self { message: message.into() }
+        Self {
+            message: message.into(),
+        }
     }
 }
 
@@ -139,12 +141,18 @@ pub struct DeserializationError {
 impl DeserializationError {
     /// Constructs a new generic `DeserializationError`.
     pub fn new(message: impl Into<String>) -> Self {
-        Self { message: message.into(), field: None }
+        Self {
+            message: message.into(),
+            field: None,
+        }
     }
 
     /// Constructs a new `DeserializationError` associated with a specific field.
     pub fn with_field(message: impl Into<String>, field: impl Into<String>) -> Self {
-        Self { message: message.into(), field: Some(field.into()) }
+        Self {
+            message: message.into(),
+            field: Some(field.into()),
+        }
     }
 }
 
@@ -171,12 +179,18 @@ pub struct JsonError {
 impl JsonError {
     /// Constructs a new generic `JsonError`.
     pub fn new(message: impl Into<String>) -> Self {
-        Self { message: message.into(), position: None }
+        Self {
+            message: message.into(),
+            position: None,
+        }
     }
 
     /// Constructs a new `JsonError` at a specific source stream position.
     pub fn at(message: impl Into<String>, position: usize) -> Self {
-        Self { message: message.into(), position: Some(position) }
+        Self {
+            message: message.into(),
+            position: Some(position),
+        }
     }
 }
 
@@ -201,7 +215,9 @@ pub struct SchemaError {
 impl SchemaError {
     /// Constructs a new `SchemaError`.
     pub fn new(message: impl Into<String>) -> Self {
-        Self { message: message.into() }
+        Self {
+            message: message.into(),
+        }
     }
 }
 

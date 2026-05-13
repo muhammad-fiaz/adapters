@@ -1,7 +1,7 @@
 //! json_parsing example — native JSON parse and stringify.
 
-use adapters::json::{parse, stringify, stringify_pretty};
 use adapters::Value;
+use adapters::json::{parse, stringify, stringify_pretty};
 use std::collections::BTreeMap;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -44,7 +44,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Pretty print
     let mut m = BTreeMap::new();
     m.insert("name".to_string(), Value::String("Bob".into()));
-    m.insert("scores".to_string(), Value::Array(vec![Value::Int(10), Value::Int(20)]));
+    m.insert(
+        "scores".to_string(),
+        Value::Array(vec![Value::Int(10), Value::Int(20)]),
+    );
     let obj = Value::Object(m);
     println!("Pretty printed:\n{}", stringify_pretty(&obj)?);
 

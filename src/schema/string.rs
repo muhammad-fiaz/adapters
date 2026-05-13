@@ -2,13 +2,13 @@
 //!
 //! Provides the [`StringSchema`] structure for string validation constraints.
 
-use crate::error::ValidationError;
-use crate::value::Value;
-use crate::validator::{
-    ValidatorChain, MinLengthValidator, MaxLengthValidator,
-    EmailValidator, RegexValidator, RequiredValidator, StrictTypeValidator,
-};
 use super::SchemaValidator;
+use crate::error::ValidationError;
+use crate::validator::{
+    EmailValidator, MaxLengthValidator, MinLengthValidator, RegexValidator, RequiredValidator,
+    StrictTypeValidator, ValidatorChain,
+};
+use crate::value::Value;
 
 /// Schema representing string constraints and mapping metadata.
 #[derive(Default)]
@@ -29,45 +29,81 @@ pub struct StringSchema {
 
 impl StringSchema {
     /// Creates a new `StringSchema` with no validation constraints.
-    pub fn new() -> Self { Default::default() }
+    pub fn new() -> Self {
+        Default::default()
+    }
 
     /// Constrains the string to have a minimum character count of $N$.
-    pub fn min_length(mut self, n: usize) -> Self { self.min_length = Some(n); self }
+    pub fn min_length(mut self, n: usize) -> Self {
+        self.min_length = Some(n);
+        self
+    }
 
     /// Constrains the string to have a maximum character count of $M$.
-    pub fn max_length(mut self, n: usize) -> Self { self.max_length = Some(n); self }
+    pub fn max_length(mut self, n: usize) -> Self {
+        self.max_length = Some(n);
+        self
+    }
 
     /// Constrains the string to be non-empty.
-    pub fn non_empty(mut self) -> Self { self.non_empty = true; self }
+    pub fn non_empty(mut self) -> Self {
+        self.non_empty = true;
+        self
+    }
 
     /// Constrains the string to contain only alphanumeric characters.
-    pub fn alphanumeric(mut self) -> Self { self.alphanumeric = true; self }
+    pub fn alphanumeric(mut self) -> Self {
+        self.alphanumeric = true;
+        self
+    }
 
     /// Restricts the string format to standard email addresses.
-    pub fn email(mut self) -> Self { self.email = true; self }
+    pub fn email(mut self) -> Self {
+        self.email = true;
+        self
+    }
 
     /// Restricts the string format to absolute URLs.
-    pub fn url(mut self) -> Self { self.url = true; self }
+    pub fn url(mut self) -> Self {
+        self.url = true;
+        self
+    }
 
     /// Matches the string value against a custom Rust regular expression pattern.
     pub fn regex(mut self, pattern: &str) -> Self {
-        self.regex_pattern = Some(pattern.to_string()); self
+        self.regex_pattern = Some(pattern.to_string());
+        self
     }
 
     /// Configures a fallback default value used when this field is missing.
-    pub fn default(mut self, val: &str) -> Self { self.default = Some(val.to_string()); self }
+    pub fn default(mut self, val: &str) -> Self {
+        self.default = Some(val.to_string());
+        self
+    }
 
     /// Registers a field key rename mapping for parsing input payloads.
-    pub fn alias(mut self, name: &str) -> Self { self.alias = Some(name.to_string()); self }
+    pub fn alias(mut self, name: &str) -> Self {
+        self.alias = Some(name.to_string());
+        self
+    }
 
     /// Configures the schema to strictly fail if the field is absent.
-    pub fn required(mut self) -> Self { self.required = true; self }
+    pub fn required(mut self) -> Self {
+        self.required = true;
+        self
+    }
 
     /// Registers the field as optional (permits `Null` values).
-    pub fn optional(mut self) -> Self { self.optional = true; self }
+    pub fn optional(mut self) -> Self {
+        self.optional = true;
+        self
+    }
 
     /// Opts into strict validation mode: non-string inputs cause immediate failure instead of coercion.
-    pub fn strict(mut self) -> Self { self.strict = true; self }
+    pub fn strict(mut self) -> Self {
+        self.strict = true;
+        self
+    }
 
     /// Returns the registered key alias name if defined.
     pub fn get_alias(&self) -> Option<&str> {
@@ -121,7 +157,9 @@ impl SchemaValidator for StringSchema {
         } else {
             value.clone()
         };
-        self.build_chain().validate(&effective, field).map_err(|errs| errs.errors[0].clone())
+        self.build_chain()
+            .validate(&effective, field)
+            .map_err(|errs| errs.errors[0].clone())
     }
 
     fn is_required(&self) -> bool {
@@ -132,7 +170,9 @@ impl SchemaValidator for StringSchema {
         self.default.as_ref().map(|s| Value::String(s.clone()))
     }
 
-    fn schema_type(&self) -> &'static str { "string" }
+    fn schema_type(&self) -> &'static str {
+        "string"
+    }
 }
 
 #[cfg(test)]
@@ -154,19 +194,28 @@ mod tests {
     #[test]
     fn test_string_too_long() {
         let s = StringSchema::new().max_length(3);
-        assert!(s.validate(&Value::String("toolong".into()), "name").is_err());
+        assert!(
+            s.validate(&Value::String("toolong".into()), "name")
+                .is_err()
+        );
     }
 
     #[test]
     fn test_string_email_valid() {
         let s = StringSchema::new().email();
-        assert!(s.validate(&Value::String("a@b.com".into()), "email").is_ok());
+        assert!(
+            s.validate(&Value::String("a@b.com".into()), "email")
+                .is_ok()
+        );
     }
 
     #[test]
     fn test_string_email_invalid() {
         let s = StringSchema::new().email();
-        assert!(s.validate(&Value::String("notanemail".into()), "email").is_err());
+        assert!(
+            s.validate(&Value::String("notanemail".into()), "email")
+                .is_err()
+        );
     }
 
     #[test]
@@ -209,8 +258,13 @@ mod tests {
     #[test]
     fn test_string_alphanumeric() {
         let s = StringSchema::new().alphanumeric();
-        assert!(s.validate(&Value::String("hello123WORLD".into()), "val").is_ok());
-        assert!(s.validate(&Value::String("hello-world".into()), "val").is_err());
+        assert!(
+            s.validate(&Value::String("hello123WORLD".into()), "val")
+                .is_ok()
+        );
+        assert!(
+            s.validate(&Value::String("hello-world".into()), "val")
+                .is_err()
+        );
     }
 }
-

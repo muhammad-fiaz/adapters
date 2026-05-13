@@ -1,11 +1,11 @@
 //! The `Adapter` trait — the central interface for data schema validation,
 //! serialization, deserialization, and representation mapping in the library.
 
+use crate::deserializer::Deserialize;
 use crate::error::Error;
 #[allow(unused_imports)]
-use crate::schema::{Schema, SchemaValidator, SchemaProvider};
+use crate::schema::{Schema, SchemaProvider, SchemaValidator};
 use crate::serializer::Serialize;
-use crate::deserializer::Deserialize;
 use crate::value::Value;
 
 /// Defines a post-construction validation behavior for concrete Rust instances.
@@ -71,8 +71,8 @@ pub trait Adapter: Serialize + Deserialize + Validate + SchemaProvider + Sized {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::schema::{ObjectSchema, StringSchema, IntegerSchema};
     use crate::error::ValidationError;
+    use crate::schema::{IntegerSchema, ObjectSchema, StringSchema};
     use std::collections::BTreeMap;
 
     #[derive(Debug, PartialEq)]
@@ -93,21 +93,20 @@ mod tests {
     impl Deserialize for User {
         fn deserialize(value: Value) -> Result<Self, Error> {
             let obj = value.as_object().ok_or_else(|| {
-                crate::error::Error::Deserialization(
-                    crate::error::DeserializationError::new("expected object")
-                )
+                crate::error::Error::Deserialization(crate::error::DeserializationError::new(
+                    "expected object",
+                ))
             })?;
-            let name = obj.get("name")
+            let name = obj
+                .get("name")
                 .and_then(|v| v.as_str())
-                .ok_or_else(|| Error::Deserialization(
-                    crate::error::DeserializationError::new("missing name")
-                ))?
+                .ok_or_else(|| {
+                    Error::Deserialization(crate::error::DeserializationError::new("missing name"))
+                })?
                 .to_string();
-            let age = obj.get("age")
-                .and_then(|v| v.as_int())
-                .ok_or_else(|| Error::Deserialization(
-                    crate::error::DeserializationError::new("missing age")
-                ))?;
+            let age = obj.get("age").and_then(|v| v.as_int()).ok_or_else(|| {
+                Error::Deserialization(crate::error::DeserializationError::new("missing age"))
+            })?;
             Ok(User { name, age })
         }
     }
@@ -126,7 +125,7 @@ mod tests {
             Schema::Object(
                 ObjectSchema::new()
                     .field("name", StringSchema::new().required().min_length(2))
-                    .field("age", IntegerSchema::new().required().min(0))
+                    .field("age", IntegerSchema::new().required().min(0)),
             )
         }
     }
@@ -148,7 +147,10 @@ mod tests {
 
     #[test]
     fn test_to_json() {
-        let u = User { name: "bob".into(), age: 25 };
+        let u = User {
+            name: "bob".into(),
+            age: 25,
+        };
         let json = u.to_json().unwrap();
         assert!(json.contains("bob"));
         assert!(json.contains("25"));
@@ -165,16 +167,25 @@ mod tests {
 
     #[test]
     fn test_to_value() {
-        let u = User { name: "dan".into(), age: 20 };
+        let u = User {
+            name: "dan".into(),
+            age: 20,
+        };
         let v = u.to_value();
         assert_eq!(v.get("name"), Some(&Value::String("dan".into())));
     }
 
     #[test]
     fn test_is_valid() {
-        let u = User { name: "alice".into(), age: 25 };
+        let u = User {
+            name: "alice".into(),
+            age: 25,
+        };
         assert!(u.is_valid());
-        let bad = User { name: "x".into(), age: 25 };
+        let bad = User {
+            name: "x".into(),
+            age: 25,
+        };
         assert!(!bad.is_valid());
     }
 }

@@ -6,9 +6,8 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 use syn::{
-    parse_macro_input, DeriveInput, Data, Fields,
-    Type, Attribute, Lit, Expr, ExprLit,
-    PathArguments, GenericArgument,
+    Attribute, Data, DeriveInput, Expr, ExprLit, Fields, GenericArgument, Lit, PathArguments, Type,
+    parse_macro_input,
 };
 
 #[derive(Default, Debug)]
@@ -111,12 +110,12 @@ fn parse_field_attrs(attrs: &[Attribute]) -> FieldAttrs {
 
 fn extract_number(expr: &Expr) -> Option<f64> {
     match expr {
-        Expr::Lit(ExprLit { lit: Lit::Int(i), .. }) => {
-            i.base10_parse::<f64>().ok()
-        }
-        Expr::Lit(ExprLit { lit: Lit::Float(f), .. }) => {
-            f.base10_parse::<f64>().ok()
-        }
+        Expr::Lit(ExprLit {
+            lit: Lit::Int(i), ..
+        }) => i.base10_parse::<f64>().ok(),
+        Expr::Lit(ExprLit {
+            lit: Lit::Float(f), ..
+        }) => f.base10_parse::<f64>().ok(),
         Expr::Unary(u) => {
             if let syn::UnOp::Neg(_) = u.op {
                 extract_number(&u.expr).map(|n| -n)
@@ -129,20 +128,36 @@ fn extract_number(expr: &Expr) -> Option<f64> {
 }
 
 fn extract_option_inner(ty: &Type) -> Option<&Type> {
-    let Type::Path(tp) = ty else { return None; };
+    let Type::Path(tp) = ty else {
+        return None;
+    };
     let seg = tp.path.segments.last()?;
-    if seg.ident != "Option" { return None; }
-    let PathArguments::AngleBracketed(ab) = &seg.arguments else { return None; };
-    let Some(GenericArgument::Type(inner)) = ab.args.first() else { return None; };
+    if seg.ident != "Option" {
+        return None;
+    }
+    let PathArguments::AngleBracketed(ab) = &seg.arguments else {
+        return None;
+    };
+    let Some(GenericArgument::Type(inner)) = ab.args.first() else {
+        return None;
+    };
     Some(inner)
 }
 
 fn extract_vec_inner(ty: &Type) -> Option<&Type> {
-    let Type::Path(tp) = ty else { return None; };
+    let Type::Path(tp) = ty else {
+        return None;
+    };
     let seg = tp.path.segments.last()?;
-    if seg.ident != "Vec" { return None; }
-    let PathArguments::AngleBracketed(ab) = &seg.arguments else { return None; };
-    let Some(GenericArgument::Type(inner)) = ab.args.first() else { return None; };
+    if seg.ident != "Vec" {
+        return None;
+    }
+    let PathArguments::AngleBracketed(ab) = &seg.arguments else {
+        return None;
+    };
+    let Some(GenericArgument::Type(inner)) = ab.args.first() else {
+        return None;
+    };
     Some(inner)
 }
 
@@ -155,11 +170,14 @@ fn type_ident_str(ty: &Type) -> Option<String> {
 }
 
 fn is_int_type(name: &str) -> bool {
-    matches!(name, "i8"|"i16"|"i32"|"i64"|"u8"|"u16"|"u32"|"u64"|"usize")
+    matches!(
+        name,
+        "i8" | "i16" | "i32" | "i64" | "u8" | "u16" | "u32" | "u64" | "usize"
+    )
 }
 
 fn is_float_type(name: &str) -> bool {
-    matches!(name, "f32"|"f64")
+    matches!(name, "f32" | "f64")
 }
 
 fn field_schema_expr(ty: &Type, attrs: &FieldAttrs) -> TokenStream2 {
@@ -247,7 +265,11 @@ fn field_schema_expr_inner(ty: &Type, attrs: &FieldAttrs, is_option: bool) -> To
         if attrs.strict {
             chain = quote! { #chain.strict() };
         }
-        if let Some(d) = attrs.default.as_ref().and_then(|def| def.parse::<i64>().ok()) {
+        if let Some(d) = attrs
+            .default
+            .as_ref()
+            .and_then(|def| def.parse::<i64>().ok())
+        {
             chain = quote! { #chain.default(#d) };
         }
         if is_option || attrs.optional {
@@ -278,7 +300,11 @@ fn field_schema_expr_inner(ty: &Type, attrs: &FieldAttrs, is_option: bool) -> To
         if attrs.strict {
             chain = quote! { #chain.strict() };
         }
-        if let Some(d) = attrs.default.as_ref().and_then(|def| def.parse::<f64>().ok()) {
+        if let Some(d) = attrs
+            .default
+            .as_ref()
+            .and_then(|def| def.parse::<f64>().ok())
+        {
             chain = quote! { #chain.default(#d) };
         }
         if is_option || attrs.optional {
@@ -618,12 +644,16 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
 
     let fields_data: Vec<(syn::Ident, &Type, FieldAttrs)> = match &input.data {
         Data::Struct(s) => match &s.fields {
-            Fields::Named(named) => named.named.iter().map(|f| {
-                let ident = f.ident.clone().expect("named field");
-                let ty = &f.ty;
-                let attrs = parse_field_attrs(&f.attrs);
-                (ident, ty, attrs)
-            }).collect(),
+            Fields::Named(named) => named
+                .named
+                .iter()
+                .map(|f| {
+                    let ident = f.ident.clone().expect("named field");
+                    let ty = &f.ty;
+                    let attrs = parse_field_attrs(&f.attrs);
+                    (ident, ty, attrs)
+                })
+                .collect(),
             _ => {
                 return syn::Error::new_spanned(
                     struct_name,
@@ -634,12 +664,9 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
             }
         },
         _ => {
-            return syn::Error::new_spanned(
-                struct_name,
-                "#[derive(Schema)] only supports structs",
-            )
-            .to_compile_error()
-            .into();
+            return syn::Error::new_spanned(struct_name, "#[derive(Schema)] only supports structs")
+                .to_compile_error()
+                .into();
         }
     };
 

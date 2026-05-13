@@ -2,10 +2,10 @@
 //!
 //! Implements standard JSON specification grammar validation and AST tree building.
 
-use std::collections::BTreeMap;
+use super::lexer::{Lexer, Token};
 use crate::error::JsonError;
 use crate::value::Value;
-use super::lexer::{Lexer, Token};
+use std::collections::BTreeMap;
 
 /// Recursive-descent parser working over a custom stream of lexical tokens.
 pub struct Parser<'a> {
@@ -15,7 +15,9 @@ pub struct Parser<'a> {
 impl<'a> Parser<'a> {
     /// Creates a new recursive-descent parser instance bound to the input string lifetime.
     pub fn new(input: &'a str) -> Self {
-        Self { lexer: Lexer::new(input) }
+        Self {
+            lexer: Lexer::new(input),
+        }
     }
 
     /// Parses the entire string payload, checking for trailing garbage tokens.
@@ -27,18 +29,20 @@ impl<'a> Parser<'a> {
         let val = self.parse_value()?;
         match self.lexer.next_token()? {
             Token::Eof => Ok(val),
-            tok => Err(JsonError::new(format!("unexpected token after value: {tok:?}"))),
+            tok => Err(JsonError::new(format!(
+                "unexpected token after value: {tok:?}"
+            ))),
         }
     }
 
     fn parse_value(&mut self) -> Result<Value, JsonError> {
         match self.lexer.next_token()? {
-            Token::LBrace   => self.parse_object_body(),
+            Token::LBrace => self.parse_object_body(),
             Token::LBracket => self.parse_array_body(),
-            Token::Str(s)   => Ok(Value::String(s)),
+            Token::Str(s) => Ok(Value::String(s)),
             Token::Number(n, is_float) => Ok(self.parse_number(n, is_float)),
-            Token::Bool(b)  => Ok(Value::Bool(b)),
-            Token::Null     => Ok(Value::Null),
+            Token::Bool(b) => Ok(Value::Bool(b)),
+            Token::Null => Ok(Value::Null),
             tok => Err(JsonError::new(format!("unexpected token: {tok:?}"))),
         }
     }
@@ -106,7 +110,9 @@ impl<'a> Parser<'a> {
         if got == expected {
             Ok(())
         } else {
-            Err(JsonError::new(format!("expected {expected:?}, got {got:?}")))
+            Err(JsonError::new(format!(
+                "expected {expected:?}, got {got:?}"
+            )))
         }
     }
 }
@@ -185,7 +191,15 @@ mod tests {
     #[test]
     fn test_deeply_nested() {
         let v = parse(r#"{"a":{"b":{"c":{"d":42}}}}"#);
-        let inner = v.get("a").unwrap().get("b").unwrap().get("c").unwrap().get("d").unwrap();
+        let inner = v
+            .get("a")
+            .unwrap()
+            .get("b")
+            .unwrap()
+            .get("c")
+            .unwrap()
+            .get("d")
+            .unwrap();
         assert_eq!(inner, &Value::Int(42));
     }
 

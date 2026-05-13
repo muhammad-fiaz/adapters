@@ -4,21 +4,20 @@
 //! [`ValidatorFn`] trait and [`ValidatorChain`] structure.
 
 pub mod common_validators;
-pub mod string_validators;
 pub mod number_validators;
+pub mod string_validators;
 
 pub use common_validators::{
-    ValidatorFn, RequiredValidator, OptionalValidator,
-    NullableValidator, StrictTypeValidator, CustomValidator,
-};
-pub use string_validators::{
-    MinLengthValidator, MaxLengthValidator, EmailValidator,
-    RegexValidator, NonEmptyValidator, AlphanumericValidator, UrlValidator,
-    is_valid_email,
+    CustomValidator, NullableValidator, OptionalValidator, RequiredValidator, StrictTypeValidator,
+    ValidatorFn,
 };
 pub use number_validators::{
-    MinIntValidator, MaxIntValidator, MinFloatValidator, MaxFloatValidator,
-    PositiveValidator, NegativeValidator, NonZeroValidator, RangeValidator,
+    MaxFloatValidator, MaxIntValidator, MinFloatValidator, MinIntValidator, NegativeValidator,
+    NonZeroValidator, PositiveValidator, RangeValidator,
+};
+pub use string_validators::{
+    AlphanumericValidator, EmailValidator, MaxLengthValidator, MinLengthValidator,
+    NonEmptyValidator, RegexValidator, UrlValidator, is_valid_email,
 };
 
 use crate::error::ValidationErrors;
@@ -82,7 +81,11 @@ mod tests {
         let chain = ValidatorChain::new()
             .push_validator(MinLengthValidator(3))
             .push_validator(MaxLengthValidator(20));
-        assert!(chain.validate(&Value::String("hello".into()), "name").is_ok());
+        assert!(
+            chain
+                .validate(&Value::String("hello".into()), "name")
+                .is_ok()
+        );
     }
 
     #[test]

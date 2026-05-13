@@ -2,9 +2,9 @@
 //!
 //! Provides the [`EnumSchema`] structure to represent string-restricted enumerations.
 
+use super::SchemaValidator;
 use crate::error::ValidationError;
 use crate::value::Value;
-use super::SchemaValidator;
 
 /// Schema representing enumerated string variant constraints.
 #[derive(Default)]
@@ -16,18 +16,27 @@ pub struct EnumSchema {
 
 impl EnumSchema {
     /// Creates a new `EnumSchema` with no structural variants configured.
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     /// Registers a valid permissible string variant name.
     pub fn variant(mut self, name: &str) -> Self {
-        self.variants.push(name.to_string()); self
+        self.variants.push(name.to_string());
+        self
     }
 
     /// Configures the schema to strictly fail if the field is absent.
-    pub fn required(mut self) -> Self { self.required = true; self }
+    pub fn required(mut self) -> Self {
+        self.required = true;
+        self
+    }
 
     /// Registers the field as optional (permits `Null` values).
-    pub fn optional(mut self) -> Self { self.optional = true; self }
+    pub fn optional(mut self) -> Self {
+        self.optional = true;
+        self
+    }
 }
 
 impl SchemaValidator for EnumSchema {
@@ -40,11 +49,13 @@ impl SchemaValidator for EnumSchema {
         }
         let s = match value.as_str() {
             Some(s) => s,
-            None => return Err(ValidationError::new(
-                field,
-                format!("expected string for enum, got {}", value.type_name()),
-                "type_mismatch",
-            )),
+            None => {
+                return Err(ValidationError::new(
+                    field,
+                    format!("expected string for enum, got {}", value.type_name()),
+                    "type_mismatch",
+                ));
+            }
         };
         if !self.variants.is_empty() && !self.variants.iter().any(|v| v == s) {
             return Err(ValidationError::new(
@@ -56,9 +67,15 @@ impl SchemaValidator for EnumSchema {
         Ok(())
     }
 
-    fn is_required(&self) -> bool { self.required }
-    fn default_value(&self) -> Option<Value> { None }
-    fn schema_type(&self) -> &'static str { "enum" }
+    fn is_required(&self) -> bool {
+        self.required
+    }
+    fn default_value(&self) -> Option<Value> {
+        None
+    }
+    fn schema_type(&self) -> &'static str {
+        "enum"
+    }
 }
 
 #[cfg(test)]

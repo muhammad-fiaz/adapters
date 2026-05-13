@@ -54,12 +54,30 @@ impl<'a> Lexer<'a> {
         self.skip_whitespace();
         match self.current_char() {
             None => Ok(Token::Eof),
-            Some('{') => { self.advance(); Ok(Token::LBrace) }
-            Some('}') => { self.advance(); Ok(Token::RBrace) }
-            Some('[') => { self.advance(); Ok(Token::LBracket) }
-            Some(']') => { self.advance(); Ok(Token::RBracket) }
-            Some(':') => { self.advance(); Ok(Token::Colon) }
-            Some(',') => { self.advance(); Ok(Token::Comma) }
+            Some('{') => {
+                self.advance();
+                Ok(Token::LBrace)
+            }
+            Some('}') => {
+                self.advance();
+                Ok(Token::RBrace)
+            }
+            Some('[') => {
+                self.advance();
+                Ok(Token::LBracket)
+            }
+            Some(']') => {
+                self.advance();
+                Ok(Token::RBracket)
+            }
+            Some(':') => {
+                self.advance();
+                Ok(Token::Colon)
+            }
+            Some(',') => {
+                self.advance();
+                Ok(Token::Comma)
+            }
             Some('"') => {
                 self.advance();
                 let s = self.read_string()?;
@@ -118,15 +136,39 @@ impl<'a> Lexer<'a> {
                 Some('\\') => {
                     self.advance();
                     match self.current_char() {
-                        Some('"')  => { out.push('"');  self.advance(); }
-                        Some('\\') => { out.push('\\'); self.advance(); }
-                        Some('/')  => { out.push('/');  self.advance(); }
-                        Some('n')  => { out.push('\n'); self.advance(); }
-                        Some('r')  => { out.push('\r'); self.advance(); }
-                        Some('t')  => { out.push('\t'); self.advance(); }
-                        Some('b')  => { out.push('\x08'); self.advance(); }
-                        Some('f')  => { out.push('\x0C'); self.advance(); }
-                        Some('u')  => {
+                        Some('"') => {
+                            out.push('"');
+                            self.advance();
+                        }
+                        Some('\\') => {
+                            out.push('\\');
+                            self.advance();
+                        }
+                        Some('/') => {
+                            out.push('/');
+                            self.advance();
+                        }
+                        Some('n') => {
+                            out.push('\n');
+                            self.advance();
+                        }
+                        Some('r') => {
+                            out.push('\r');
+                            self.advance();
+                        }
+                        Some('t') => {
+                            out.push('\t');
+                            self.advance();
+                        }
+                        Some('b') => {
+                            out.push('\x08');
+                            self.advance();
+                        }
+                        Some('f') => {
+                            out.push('\x0C');
+                            self.advance();
+                        }
+                        Some('u') => {
                             self.advance();
                             let hex = self.read_hex4()?;
                             if (0xD800..=0xDBFF).contains(&hex) {
@@ -142,7 +184,10 @@ impl<'a> Lexer<'a> {
                                             if let Some(ch) = char::from_u32(code_point) {
                                                 out.push(ch);
                                             } else {
-                                                return Err(JsonError::at("invalid unicode surrogate pair", self.pos));
+                                                return Err(JsonError::at(
+                                                    "invalid unicode surrogate pair",
+                                                    self.pos,
+                                                ));
                                             }
                                             continue;
                                         }
@@ -155,10 +200,12 @@ impl<'a> Lexer<'a> {
                                 return Err(JsonError::at("invalid unicode code point", self.pos));
                             }
                         }
-                        Some(c) => return Err(JsonError::at(
-                            format!("invalid escape sequence '\\{c}'"),
-                            self.pos,
-                        )),
+                        Some(c) => {
+                            return Err(JsonError::at(
+                                format!("invalid escape sequence '\\{c}'"),
+                                self.pos,
+                            ));
+                        }
                         None => return Err(JsonError::at("unexpected end in escape", self.pos)),
                     }
                 }
@@ -192,8 +239,16 @@ impl<'a> Lexer<'a> {
         }
         if self.current_char() == Some('0') {
             self.advance();
-        } else if self.current_char().map(|c| c.is_ascii_digit()).unwrap_or(false) {
-            while self.current_char().map(|c| c.is_ascii_digit()).unwrap_or(false) {
+        } else if self
+            .current_char()
+            .map(|c| c.is_ascii_digit())
+            .unwrap_or(false)
+        {
+            while self
+                .current_char()
+                .map(|c| c.is_ascii_digit())
+                .unwrap_or(false)
+            {
                 self.advance();
             }
         } else {
@@ -202,10 +257,21 @@ impl<'a> Lexer<'a> {
         if self.current_char() == Some('.') {
             is_float = true;
             self.advance();
-            if !self.current_char().map(|c| c.is_ascii_digit()).unwrap_or(false) {
-                return Err(JsonError::at("digit expected after decimal point", self.pos));
+            if !self
+                .current_char()
+                .map(|c| c.is_ascii_digit())
+                .unwrap_or(false)
+            {
+                return Err(JsonError::at(
+                    "digit expected after decimal point",
+                    self.pos,
+                ));
             }
-            while self.current_char().map(|c| c.is_ascii_digit()).unwrap_or(false) {
+            while self
+                .current_char()
+                .map(|c| c.is_ascii_digit())
+                .unwrap_or(false)
+            {
                 self.advance();
             }
         }
@@ -215,15 +281,25 @@ impl<'a> Lexer<'a> {
             if matches!(self.current_char(), Some('+') | Some('-')) {
                 self.advance();
             }
-            if !self.current_char().map(|c| c.is_ascii_digit()).unwrap_or(false) {
+            if !self
+                .current_char()
+                .map(|c| c.is_ascii_digit())
+                .unwrap_or(false)
+            {
                 return Err(JsonError::at("digit expected in exponent", self.pos));
             }
-            while self.current_char().map(|c| c.is_ascii_digit()).unwrap_or(false) {
+            while self
+                .current_char()
+                .map(|c| c.is_ascii_digit())
+                .unwrap_or(false)
+            {
                 self.advance();
             }
         }
         let slice = &self.input[start..self.pos];
-        let val = slice.parse::<f64>().map_err(|_| JsonError::at(format!("invalid number '{slice}'"), start))?;
+        let val = slice
+            .parse::<f64>()
+            .map_err(|_| JsonError::at(format!("invalid number '{slice}'"), start))?;
         Ok((val, is_float))
     }
 
@@ -257,7 +333,9 @@ mod tests {
         let mut out = vec![];
         loop {
             let t = lex.next_token().unwrap();
-            if t == Token::Eof { break; }
+            if t == Token::Eof {
+                break;
+            }
             out.push(t);
         }
         out
@@ -265,11 +343,17 @@ mod tests {
 
     #[test]
     fn test_punctuation() {
-        assert_eq!(tokens("{}[],:"), vec![
-            Token::LBrace, Token::RBrace,
-            Token::LBracket, Token::RBracket,
-            Token::Comma, Token::Colon,
-        ]);
+        assert_eq!(
+            tokens("{}[],:"),
+            vec![
+                Token::LBrace,
+                Token::RBrace,
+                Token::LBracket,
+                Token::RBracket,
+                Token::Comma,
+                Token::Colon,
+            ]
+        );
     }
 
     #[test]
@@ -312,9 +396,10 @@ mod tests {
 
     #[test]
     fn test_bool_null() {
-        assert_eq!(tokens("true false null"), vec![
-            Token::Bool(true), Token::Bool(false), Token::Null,
-        ]);
+        assert_eq!(
+            tokens("true false null"),
+            vec![Token::Bool(true), Token::Bool(false), Token::Null,]
+        );
     }
 
     #[test]

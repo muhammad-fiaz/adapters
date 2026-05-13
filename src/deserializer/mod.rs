@@ -3,9 +3,9 @@
 //! This module defines the [`Deserialize`] trait, which handles safe type conversion
 //! and value-level range checks during deserialization from standard and nested formats.
 
-use std::collections::BTreeMap;
 use crate::error::{DeserializationError, Error};
 use crate::value::Value;
+use std::collections::BTreeMap;
 
 /// Conversion of an unstructured or structured [`Value`] into a typed Rust representation.
 ///
@@ -26,9 +26,11 @@ impl Deserialize for bool {
     fn deserialize(value: Value) -> Result<Self, Error> {
         match value {
             Value::Bool(b) => Ok(b),
-            other => Err(DeserializationError::new(
-                format!("expected bool, got {}", other.type_name())
-            ).into()),
+            other => Err(DeserializationError::new(format!(
+                "expected bool, got {}",
+                other.type_name()
+            ))
+            .into()),
         }
     }
 }
@@ -37,9 +39,11 @@ impl Deserialize for String {
     fn deserialize(value: Value) -> Result<Self, Error> {
         match value {
             Value::String(s) => Ok(s),
-            other => Err(DeserializationError::new(
-                format!("expected string, got {}", other.type_name())
-            ).into()),
+            other => Err(DeserializationError::new(format!(
+                "expected string, got {}",
+                other.type_name()
+            ))
+            .into()),
         }
     }
 }
@@ -49,9 +53,11 @@ impl Deserialize for f64 {
         match value {
             Value::Float(f) => Ok(f),
             Value::Int(n) => Ok(n as f64),
-            other => Err(DeserializationError::new(
-                format!("expected float, got {}", other.type_name())
-            ).into()),
+            other => Err(DeserializationError::new(format!(
+                "expected float, got {}",
+                other.type_name()
+            ))
+            .into()),
         }
     }
 }
@@ -85,10 +91,18 @@ macro_rules! deserialize_int {
 }
 
 deserialize_int!(
-    i8,  i8::MIN,  i8::MAX,
-    i16, i16::MIN, i16::MAX,
-    i32, i32::MIN, i32::MAX,
-    i64, i64::MIN, i64::MAX
+    i8,
+    i8::MIN,
+    i8::MAX,
+    i16,
+    i16::MIN,
+    i16::MAX,
+    i32,
+    i32::MIN,
+    i32::MAX,
+    i64,
+    i64::MIN,
+    i64::MAX
 );
 
 macro_rules! deserialize_uint {
@@ -113,24 +127,21 @@ macro_rules! deserialize_uint {
     };
 }
 
-deserialize_uint!(
-    u8,    u8::MAX,
-    u16,   u16::MAX,
-    u32,   u32::MAX,
-    usize, usize::MAX
-);
+deserialize_uint!(u8, u8::MAX, u16, u16::MAX, u32, u32::MAX, usize, usize::MAX);
 
 impl Deserialize for u64 {
     fn deserialize(value: Value) -> Result<Self, Error> {
         match value {
             Value::Int(n) if n >= 0 => Ok(n as u64),
-            Value::Int(n) => Err(DeserializationError::new(
-                format!("value {n} out of range for u64")
-            ).into()),
+            Value::Int(n) => {
+                Err(DeserializationError::new(format!("value {n} out of range for u64")).into())
+            }
             Value::Float(f) if f.fract() == 0.0 && f >= 0.0 => Ok(f as u64),
-            other => Err(DeserializationError::new(
-                format!("expected integer, got {}", other.type_name())
-            ).into()),
+            other => Err(DeserializationError::new(format!(
+                "expected integer, got {}",
+                other.type_name()
+            ))
+            .into()),
         }
     }
 }
@@ -149,9 +160,11 @@ impl<T: Deserialize> Deserialize for Vec<T> {
     fn deserialize(value: Value) -> Result<Self, Error> {
         match value {
             Value::Array(arr) => arr.into_iter().map(T::deserialize).collect(),
-            other => Err(DeserializationError::new(
-                format!("expected array, got {}", other.type_name())
-            ).into()),
+            other => Err(DeserializationError::new(format!(
+                "expected array, got {}",
+                other.type_name()
+            ))
+            .into()),
         }
     }
 }
@@ -159,14 +172,15 @@ impl<T: Deserialize> Deserialize for Vec<T> {
 impl<T: Deserialize> Deserialize for BTreeMap<String, T> {
     fn deserialize(value: Value) -> Result<Self, Error> {
         match value {
-            Value::Object(map) => {
-                map.into_iter()
-                    .map(|(k, v)| T::deserialize(v).map(|t| (k, t)))
-                    .collect()
-            }
-            other => Err(DeserializationError::new(
-                format!("expected object, got {}", other.type_name())
-            ).into()),
+            Value::Object(map) => map
+                .into_iter()
+                .map(|(k, v)| T::deserialize(v).map(|t| (k, t)))
+                .collect(),
+            other => Err(DeserializationError::new(format!(
+                "expected object, got {}",
+                other.type_name()
+            ))
+            .into()),
         }
     }
 }
@@ -228,7 +242,10 @@ mod tests {
 
     #[test]
     fn test_string() {
-        assert_eq!(String::deserialize(Value::String("hi".into())).unwrap(), "hi");
+        assert_eq!(
+            String::deserialize(Value::String("hi".into())).unwrap(),
+            "hi"
+        );
     }
 
     #[test]
@@ -245,9 +262,7 @@ mod tests {
 
     #[test]
     fn test_vec() {
-        let v = Vec::<i32>::deserialize(Value::Array(vec![
-            Value::Int(1), Value::Int(2),
-        ])).unwrap();
+        let v = Vec::<i32>::deserialize(Value::Array(vec![Value::Int(1), Value::Int(2)])).unwrap();
         assert_eq!(v, vec![1, 2]);
     }
 

@@ -1,7 +1,7 @@
 //! strict_mode example — demonstrates strict type validation.
 
-use adapters_macros::Schema;
 use adapters::{Adapter, Schema as SchemaApi, SchemaValidator, Value};
+use adapters_macros::Schema;
 
 #[derive(Schema, Debug)]
 struct Payment {

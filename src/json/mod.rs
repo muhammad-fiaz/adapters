@@ -62,7 +62,9 @@ fn write_value(buf: &mut String, value: &Value) {
         Value::Array(arr) => {
             buf.push('[');
             for (i, v) in arr.iter().enumerate() {
-                if i > 0 { buf.push(','); }
+                if i > 0 {
+                    buf.push(',');
+                }
                 write_value(buf, v);
             }
             buf.push(']');
@@ -70,7 +72,9 @@ fn write_value(buf: &mut String, value: &Value) {
         Value::Object(map) => {
             buf.push('{');
             for (i, (k, v)) in map.iter().enumerate() {
-                if i > 0 { buf.push(','); }
+                if i > 0 {
+                    buf.push(',');
+                }
                 write_json_string(buf, k);
                 buf.push(':');
                 write_value(buf, v);
@@ -89,7 +93,9 @@ fn write_value_pretty(buf: &mut String, value: &Value, indent: usize) {
             }
             buf.push('[');
             for (i, v) in arr.iter().enumerate() {
-                if i > 0 { buf.push(','); }
+                if i > 0 {
+                    buf.push(',');
+                }
                 buf.push('\n');
                 push_indent(buf, indent + 1);
                 write_value_pretty(buf, v, indent + 1);
@@ -105,7 +111,9 @@ fn write_value_pretty(buf: &mut String, value: &Value, indent: usize) {
             }
             buf.push('{');
             for (i, (k, v)) in map.iter().enumerate() {
-                if i > 0 { buf.push(','); }
+                if i > 0 {
+                    buf.push(',');
+                }
                 buf.push('\n');
                 push_indent(buf, indent + 1);
                 write_json_string(buf, k);
@@ -130,7 +138,7 @@ fn write_json_string(buf: &mut String, s: &str) {
     buf.push('"');
     for ch in s.chars() {
         match ch {
-            '"'  => buf.push_str("\\\""),
+            '"' => buf.push_str("\\\""),
             '\\' => buf.push_str("\\\\"),
             '\n' => buf.push_str("\\n"),
             '\r' => buf.push_str("\\r"),
@@ -283,6 +291,9 @@ mod tests {
     #[test]
     fn test_stringify_pretty_empty_containers() {
         assert_eq!(stringify_pretty(&Value::Array(vec![])).unwrap(), "[]");
-        assert_eq!(stringify_pretty(&Value::Object(BTreeMap::new())).unwrap(), "{}");
+        assert_eq!(
+            stringify_pretty(&Value::Object(BTreeMap::new())).unwrap(),
+            "{}"
+        );
     }
 }

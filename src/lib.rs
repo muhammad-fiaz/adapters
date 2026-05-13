@@ -93,27 +93,26 @@
 //! | `default = <expr>` | All types | Populates field with expression value when key is absent. |
 //!
 
-pub mod value;
-pub mod schema;
-pub mod validator;
-pub mod serializer;
-pub mod deserializer;
-pub mod json;
-pub mod error;
-pub mod transform;
 pub mod adapter;
+pub mod deserializer;
+pub mod error;
+pub mod json;
+pub mod schema;
+pub mod serializer;
+pub mod transform;
+pub mod validator;
+pub mod value;
 
-pub use value::Value;
-pub use schema::{
-    Schema, ObjectSchema, StringSchema, IntegerSchema,
-    FloatSchema, BoolSchema, ArraySchema, EnumSchema, NullSchema,
-    SchemaValidator, SchemaProvider,
-};
 pub use adapter::{Adapter, Validate};
-pub use serializer::Serialize;
 pub use deserializer::Deserialize;
-pub use transform::{Adapt, Pipeline, FieldMapper};
 pub use error::{Error, ValidationError, ValidationErrors};
+pub use schema::{
+    ArraySchema, BoolSchema, EnumSchema, FloatSchema, IntegerSchema, NullSchema, ObjectSchema,
+    Schema, SchemaProvider, SchemaValidator, StringSchema,
+};
+pub use serializer::Serialize;
+pub use transform::{Adapt, FieldMapper, Pipeline};
+pub use value::Value;
 
 pub use adapters_macros::Schema;
 
@@ -121,8 +120,8 @@ pub use adapters_macros::Schema;
 /// for ergonomic integration across projects.
 pub mod prelude {
     pub use crate::{
-        Value, Schema, Adapter, Validate, Serialize, Deserialize,
-        Adapt, Pipeline, FieldMapper, Error, ValidationError, ValidationErrors,
+        Adapt, Adapter, Deserialize, Error, FieldMapper, Pipeline, Schema, Serialize, Validate,
+        ValidationError, ValidationErrors, Value,
     };
 }
 

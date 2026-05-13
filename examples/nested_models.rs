@@ -1,7 +1,7 @@
 //! nested_models example — nested structs with validation error path reporting.
 
-use adapters_macros::Schema;
 use adapters::{Adapter, Validate};
+use adapters_macros::Schema;
 
 #[derive(Schema, Debug)]
 struct Address {

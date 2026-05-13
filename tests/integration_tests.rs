@@ -3,11 +3,9 @@
 //! Verifies standard structural derives, runtime dynamic schemas, pipeline conversions, and error formats.
 
 use adapters::{
-    Adapter, Schema, SchemaValidator,
-    Value, Error, ValidationError,
-    Pipeline, FieldMapper, Adapt,
+    Adapt, Adapter, ArraySchema, Error, FieldMapper, IntegerSchema, ObjectSchema, Pipeline, Schema,
+    SchemaValidator, StringSchema, ValidationError, Value,
     json::{parse, stringify, stringify_pretty},
-    ObjectSchema, StringSchema, IntegerSchema, ArraySchema,
 };
 use adapters_macros::Schema as SchemaDerived;
 use std::collections::BTreeMap;
@@ -63,8 +61,8 @@ struct Strict {
 
 #[test]
 fn test_derive_basic_round_trip() {
-    let u = User::from_json(r#"{"username":"alice","email":"alice@example.com","age":25}"#)
-        .unwrap();
+    let u =
+        User::from_json(r#"{"username":"alice","email":"alice@example.com","age":25}"#).unwrap();
     assert_eq!(u.username, "alice");
     assert_eq!(u.email, "alice@example.com");
     assert_eq!(u.age, 25);
@@ -141,8 +139,10 @@ fn test_nested_model_round_trip() {
 fn test_nested_validation_error_path() {
     let schema = ObjectSchema::new()
         .field("username", StringSchema::new().required())
-        .field("address", ObjectSchema::new()
-            .field("city", StringSchema::new().required().min_length(3)));
+        .field(
+            "address",
+            ObjectSchema::new().field("city", StringSchema::new().required().min_length(3)),
+        );
     let v = make_obj(&[
         ("username", Value::String("alice".into())),
         ("address", make_obj(&[("city", Value::String("ab".into()))])),
@@ -201,14 +201,16 @@ fn test_object_schema_builder_valid() {
     let s = ObjectSchema::new()
         .field("name", StringSchema::new().required().min_length(2))
         .field("age", IntegerSchema::new().required().min(0));
-    let v = make_obj(&[("name", Value::String("alice".into())), ("age", Value::Int(30))]);
+    let v = make_obj(&[
+        ("name", Value::String("alice".into())),
+        ("age", Value::Int(30)),
+    ]);
     assert!(s.validate(&v, "root").is_ok());
 }
 
 #[test]
 fn test_object_schema_builder_invalid() {
-    let s = ObjectSchema::new()
-        .field("name", StringSchema::new().required().min_length(5));
+    let s = ObjectSchema::new().field("name", StringSchema::new().required().min_length(5));
     let v = make_obj(&[("name", Value::String("ab".into()))]);
     assert!(s.validate(&v, "root").is_err());
 }
@@ -217,7 +219,10 @@ fn test_object_schema_builder_invalid() {
 fn test_string_schema_email_validator() {
     let s = Schema::String(Schema::string().required().email());
     assert!(s.validate(&Value::String("a@b.com".into()), "e").is_ok());
-    assert!(s.validate(&Value::String("notanemail".into()), "e").is_err());
+    assert!(
+        s.validate(&Value::String("notanemail".into()), "e")
+            .is_err()
+    );
 }
 
 #[test]
@@ -395,7 +400,10 @@ fn test_nested_model_validation_fails() {
     let res = UserWithAddress::from_json(json);
     assert!(res.is_err());
     let e = res.unwrap_err().to_string();
-    assert!(e.contains("address.city") || e.contains("required"), "error: {e}");
+    assert!(
+        e.contains("address.city") || e.contains("required"),
+        "error: {e}"
+    );
 }
 
 #[derive(Schema, Debug)]
@@ -481,4 +489,3 @@ fn test_extra_macro_validations_fail_zero_nonzero() {
     let res = ExtraMacroFeatures::from_json(json);
     assert!(res.is_err());
 }
-

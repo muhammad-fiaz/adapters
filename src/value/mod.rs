@@ -30,60 +30,108 @@ pub enum Value {
 
 impl Value {
     /// Returns `true` if the value is `Null`.
-    pub fn is_null(&self) -> bool { matches!(self, Value::Null) }
+    pub fn is_null(&self) -> bool {
+        matches!(self, Value::Null)
+    }
     /// Returns `true` if the value is a boolean.
-    pub fn is_bool(&self) -> bool { matches!(self, Value::Bool(_)) }
+    pub fn is_bool(&self) -> bool {
+        matches!(self, Value::Bool(_))
+    }
     /// Returns `true` if the value is an integer.
-    pub fn is_int(&self) -> bool { matches!(self, Value::Int(_)) }
+    pub fn is_int(&self) -> bool {
+        matches!(self, Value::Int(_))
+    }
     /// Returns `true` if the value is a float.
-    pub fn is_float(&self) -> bool { matches!(self, Value::Float(_)) }
+    pub fn is_float(&self) -> bool {
+        matches!(self, Value::Float(_))
+    }
     /// Returns `true` if the value is numeric (integer or float).
-    pub fn is_number(&self) -> bool { self.is_int() || self.is_float() }
+    pub fn is_number(&self) -> bool {
+        self.is_int() || self.is_float()
+    }
     /// Returns `true` if the value is a string.
-    pub fn is_string(&self) -> bool { matches!(self, Value::String(_)) }
+    pub fn is_string(&self) -> bool {
+        matches!(self, Value::String(_))
+    }
     /// Returns `true` if the value is an array.
-    pub fn is_array(&self) -> bool { matches!(self, Value::Array(_)) }
+    pub fn is_array(&self) -> bool {
+        matches!(self, Value::Array(_))
+    }
     /// Returns `true` if the value is an object.
-    pub fn is_object(&self) -> bool { matches!(self, Value::Object(_)) }
+    pub fn is_object(&self) -> bool {
+        matches!(self, Value::Object(_))
+    }
 
     /// Extracts the inner boolean value if possible.
     pub fn as_bool(&self) -> Option<bool> {
-        if let Value::Bool(b) = self { Some(*b) } else { None }
+        if let Value::Bool(b) = self {
+            Some(*b)
+        } else {
+            None
+        }
     }
 
     /// Extracts the inner 64-bit integer value if possible.
     pub fn as_int(&self) -> Option<i64> {
-        if let Value::Int(n) = self { Some(*n) } else { None }
+        if let Value::Int(n) = self {
+            Some(*n)
+        } else {
+            None
+        }
     }
 
     /// Extracts the inner float value if possible.
     pub fn as_float(&self) -> Option<f64> {
-        if let Value::Float(f) = self { Some(*f) } else { None }
+        if let Value::Float(f) = self {
+            Some(*f)
+        } else {
+            None
+        }
     }
 
     /// Extracts a slice reference to the inner string if possible.
     pub fn as_str(&self) -> Option<&str> {
-        if let Value::String(s) = self { Some(s.as_str()) } else { None }
+        if let Value::String(s) = self {
+            Some(s.as_str())
+        } else {
+            None
+        }
     }
 
     /// Extracts a reference to the inner array if possible.
     pub fn as_array(&self) -> Option<&Vec<Value>> {
-        if let Value::Array(a) = self { Some(a) } else { None }
+        if let Value::Array(a) = self {
+            Some(a)
+        } else {
+            None
+        }
     }
 
     /// Extracts a reference to the inner object map if possible.
     pub fn as_object(&self) -> Option<&BTreeMap<std::string::String, Value>> {
-        if let Value::Object(o) = self { Some(o) } else { None }
+        if let Value::Object(o) = self {
+            Some(o)
+        } else {
+            None
+        }
     }
 
     /// Extracts a mutable reference to the inner array if possible.
     pub fn as_array_mut(&mut self) -> Option<&mut Vec<Value>> {
-        if let Value::Array(a) = self { Some(a) } else { None }
+        if let Value::Array(a) = self {
+            Some(a)
+        } else {
+            None
+        }
     }
 
     /// Extracts a mutable reference to the inner object map if possible.
     pub fn as_object_mut(&mut self) -> Option<&mut BTreeMap<std::string::String, Value>> {
-        if let Value::Object(o) = self { Some(o) } else { None }
+        if let Value::Object(o) = self {
+            Some(o)
+        } else {
+            None
+        }
     }
 
     /// Retrieves an immutable field reference by key if the value is an object.
@@ -247,7 +295,9 @@ impl fmt::Display for Value {
 }
 
 impl From<bool> for Value {
-    fn from(b: bool) -> Self { Value::Bool(b) }
+    fn from(b: bool) -> Self {
+        Value::Bool(b)
+    }
 }
 
 macro_rules! from_int {
@@ -260,27 +310,39 @@ macro_rules! from_int {
 from_int!(i8, i16, i32, i64, u8, u16, u32, u64, usize);
 
 impl From<f32> for Value {
-    fn from(f: f32) -> Self { Value::Float(f as f64) }
+    fn from(f: f32) -> Self {
+        Value::Float(f as f64)
+    }
 }
 
 impl From<f64> for Value {
-    fn from(f: f64) -> Self { Value::Float(f) }
+    fn from(f: f64) -> Self {
+        Value::Float(f)
+    }
 }
 
 impl From<std::string::String> for Value {
-    fn from(s: std::string::String) -> Self { Value::String(s) }
+    fn from(s: std::string::String) -> Self {
+        Value::String(s)
+    }
 }
 
 impl From<&str> for Value {
-    fn from(s: &str) -> Self { Value::String(s.to_string()) }
+    fn from(s: &str) -> Self {
+        Value::String(s.to_string())
+    }
 }
 
 impl From<Vec<Value>> for Value {
-    fn from(v: Vec<Value>) -> Self { Value::Array(v) }
+    fn from(v: Vec<Value>) -> Self {
+        Value::Array(v)
+    }
 }
 
 impl From<BTreeMap<std::string::String, Value>> for Value {
-    fn from(m: BTreeMap<std::string::String, Value>) -> Self { Value::Object(m) }
+    fn from(m: BTreeMap<std::string::String, Value>) -> Self {
+        Value::Object(m)
+    }
 }
 
 impl From<Option<Value>> for Value {
@@ -360,7 +422,10 @@ mod tests {
 
     #[test]
     fn test_coerce_to_string() {
-        assert_eq!(Value::String("hi".into()).coerce_to_string(), Some("hi".into()));
+        assert_eq!(
+            Value::String("hi".into()).coerce_to_string(),
+            Some("hi".into())
+        );
         assert_eq!(Value::Int(7).coerce_to_string(), Some("7".into()));
         assert_eq!(Value::Bool(false).coerce_to_string(), Some("false".into()));
     }

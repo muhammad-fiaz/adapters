@@ -2,9 +2,9 @@
 //!
 //! This module provides dynamic structures and traits to map and remodel data.
 
-use std::collections::BTreeMap;
 use crate::error::Error;
 use crate::value::Value;
+use std::collections::BTreeMap;
 
 /// Convert a value of type `T` into `Self`.
 ///
@@ -77,17 +77,16 @@ impl FieldMapper {
             Some(obj) => {
                 let mut out = BTreeMap::new();
                 for (k, v) in obj {
-                    let new_key = self.mappings
-                        .get(k)
-                        .cloned()
-                        .unwrap_or_else(|| k.clone());
+                    let new_key = self.mappings.get(k).cloned().unwrap_or_else(|| k.clone());
                     out.insert(new_key, v.clone());
                 }
                 Ok(Value::Object(out))
             }
-            None => Err(crate::error::SerializationError::new(
-                format!("FieldMapper expects an object, got {}", value.type_name())
-            ).into()),
+            None => Err(crate::error::SerializationError::new(format!(
+                "FieldMapper expects an object, got {}",
+                value.type_name()
+            ))
+            .into()),
         }
     }
 }

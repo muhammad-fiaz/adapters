@@ -3,8 +3,8 @@
 //! This module defines the [`Serialize`] trait, which provides structural mapping
 //! from typed domain models to dynamic unstructured formats.
 
-use std::collections::BTreeMap;
 use crate::value::Value;
+use std::collections::BTreeMap;
 
 /// Conversion of a concrete Rust type into a generic [`Value`] representation.
 ///
@@ -16,15 +16,21 @@ pub trait Serialize {
 }
 
 impl Serialize for bool {
-    fn serialize(&self) -> Value { Value::Bool(*self) }
+    fn serialize(&self) -> Value {
+        Value::Bool(*self)
+    }
 }
 
 impl Serialize for String {
-    fn serialize(&self) -> Value { Value::String(self.clone()) }
+    fn serialize(&self) -> Value {
+        Value::String(self.clone())
+    }
 }
 
 impl Serialize for &str {
-    fn serialize(&self) -> Value { Value::String(self.to_string()) }
+    fn serialize(&self) -> Value {
+        Value::String(self.to_string())
+    }
 }
 
 macro_rules! serialize_int {
@@ -37,11 +43,15 @@ macro_rules! serialize_int {
 serialize_int!(i8, i16, i32, i64, u8, u16, u32, u64, usize);
 
 impl Serialize for f32 {
-    fn serialize(&self) -> Value { Value::Float(*self as f64) }
+    fn serialize(&self) -> Value {
+        Value::Float(*self as f64)
+    }
 }
 
 impl Serialize for f64 {
-    fn serialize(&self) -> Value { Value::Float(*self) }
+    fn serialize(&self) -> Value {
+        Value::Float(*self)
+    }
 }
 
 impl<T: Serialize> Serialize for Option<T> {
@@ -70,7 +80,9 @@ impl<T: Serialize> Serialize for BTreeMap<String, T> {
 }
 
 impl Serialize for Value {
-    fn serialize(&self) -> Value { self.clone() }
+    fn serialize(&self) -> Value {
+        self.clone()
+    }
 }
 
 #[cfg(test)]
@@ -98,7 +110,10 @@ mod tests {
     #[test]
     fn test_string() {
         assert_eq!("hello".serialize(), Value::String("hello".into()));
-        assert_eq!("world".to_string().serialize(), Value::String("world".into()));
+        assert_eq!(
+            "world".to_string().serialize(),
+            Value::String("world".into())
+        );
     }
 
     #[test]
@@ -116,9 +131,10 @@ mod tests {
     #[test]
     fn test_vec() {
         let v = vec![1i32, 2, 3];
-        assert_eq!(v.serialize(), Value::Array(vec![
-            Value::Int(1), Value::Int(2), Value::Int(3),
-        ]));
+        assert_eq!(
+            v.serialize(),
+            Value::Array(vec![Value::Int(1), Value::Int(2), Value::Int(3),])
+        );
     }
 
     #[test]

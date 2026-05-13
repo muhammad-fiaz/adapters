@@ -1,7 +1,7 @@
 //! basic_schema example — demonstrates #[derive(Schema)], from_json, validate, to_json.
 
+use adapters::{Adapter, SchemaProvider, Validate};
 use adapters_macros::Schema;
-use adapters::{Adapter, Validate, SchemaProvider};
 
 #[derive(Schema, Debug)]
 struct User {

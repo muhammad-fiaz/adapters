@@ -2,9 +2,9 @@
 //!
 //! Provides the [`ArraySchema`] structure for array validation constraints and inner element auditing.
 
+use super::SchemaValidator;
 use crate::error::ValidationError;
 use crate::value::Value;
-use super::SchemaValidator;
 
 /// Schema representing array validation constraints and item schemas.
 pub struct ArraySchema {
@@ -28,16 +28,28 @@ impl ArraySchema {
     }
 
     /// Enforces the array to hold a minimum of $N$ items.
-    pub fn min_items(mut self, n: usize) -> Self { self.min_items = Some(n); self }
+    pub fn min_items(mut self, n: usize) -> Self {
+        self.min_items = Some(n);
+        self
+    }
 
     /// Enforces the array to hold a maximum of $M$ items.
-    pub fn max_items(mut self, n: usize) -> Self { self.max_items = Some(n); self }
+    pub fn max_items(mut self, n: usize) -> Self {
+        self.max_items = Some(n);
+        self
+    }
 
     /// Configures the schema to strictly fail if the field is absent.
-    pub fn required(mut self) -> Self { self.required = true; self }
+    pub fn required(mut self) -> Self {
+        self.required = true;
+        self
+    }
 
     /// Registers the field as optional (permits `Null` values).
-    pub fn optional(mut self) -> Self { self.optional = true; self }
+    pub fn optional(mut self) -> Self {
+        self.optional = true;
+        self
+    }
 }
 
 impl SchemaValidator for ArraySchema {
@@ -50,11 +62,13 @@ impl SchemaValidator for ArraySchema {
         }
         let arr = match value.as_array() {
             Some(a) => a,
-            None => return Err(ValidationError::new(
-                field,
-                format!("expected array, got {}", value.type_name()),
-                "type_mismatch",
-            )),
+            None => {
+                return Err(ValidationError::new(
+                    field,
+                    format!("expected array, got {}", value.type_name()),
+                    "type_mismatch",
+                ));
+            }
         };
         if let Some(min) = self.min_items
             && arr.len() < min
@@ -81,9 +95,15 @@ impl SchemaValidator for ArraySchema {
         Ok(())
     }
 
-    fn is_required(&self) -> bool { self.required }
-    fn default_value(&self) -> Option<Value> { None }
-    fn schema_type(&self) -> &'static str { "array" }
+    fn is_required(&self) -> bool {
+        self.required
+    }
+    fn default_value(&self) -> Option<Value> {
+        None
+    }
+    fn schema_type(&self) -> &'static str {
+        "array"
+    }
 }
 
 #[cfg(test)]
@@ -94,19 +114,14 @@ mod tests {
     #[test]
     fn test_array_valid() {
         let s = ArraySchema::new(StringSchema::new());
-        let arr = Value::Array(vec![
-            Value::String("a".into()),
-            Value::String("b".into()),
-        ]);
+        let arr = Value::Array(vec![Value::String("a".into()), Value::String("b".into())]);
         assert!(s.validate(&arr, "tags").is_ok());
     }
 
     #[test]
     fn test_array_item_fails() {
         let s = ArraySchema::new(StringSchema::new().email());
-        let arr = Value::Array(vec![
-            Value::String("notanemail".into()),
-        ]);
+        let arr = Value::Array(vec![Value::String("notanemail".into())]);
         assert!(s.validate(&arr, "emails").is_err());
     }
 

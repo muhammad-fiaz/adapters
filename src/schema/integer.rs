@@ -2,13 +2,12 @@
 //!
 //! Provides the [`IntegerSchema`] structure for integer validation constraints.
 
-use crate::error::ValidationError;
-use crate::value::Value;
-use crate::validator::{
-    ValidatorChain, MinIntValidator, MaxIntValidator,
-    RequiredValidator, StrictTypeValidator,
-};
 use super::SchemaValidator;
+use crate::error::ValidationError;
+use crate::validator::{
+    MaxIntValidator, MinIntValidator, RequiredValidator, StrictTypeValidator, ValidatorChain,
+};
+use crate::value::Value;
 
 /// Schema representing integer constraints and mapping metadata.
 #[derive(Default)]
@@ -26,34 +25,63 @@ pub struct IntegerSchema {
 
 impl IntegerSchema {
     /// Creates a new `IntegerSchema` with no validation constraints.
-    pub fn new() -> Self { Default::default() }
+    pub fn new() -> Self {
+        Default::default()
+    }
 
     /// Constrains the integer to be greater than or equal to $N$.
-    pub fn min(mut self, n: i64) -> Self { self.min = Some(n); self }
+    pub fn min(mut self, n: i64) -> Self {
+        self.min = Some(n);
+        self
+    }
 
     /// Constrains the integer to be less than or equal to $M$.
-    pub fn max(mut self, n: i64) -> Self { self.max = Some(n); self }
+    pub fn max(mut self, n: i64) -> Self {
+        self.max = Some(n);
+        self
+    }
 
     /// Constrains the integer to be strictly positive (> 0).
-    pub fn positive(mut self) -> Self { self.positive = true; self }
+    pub fn positive(mut self) -> Self {
+        self.positive = true;
+        self
+    }
 
     /// Constrains the integer to be strictly negative (< 0).
-    pub fn negative(mut self) -> Self { self.negative = true; self }
+    pub fn negative(mut self) -> Self {
+        self.negative = true;
+        self
+    }
 
     /// Constrains the integer to be non-zero (!= 0).
-    pub fn non_zero(mut self) -> Self { self.non_zero = true; self }
+    pub fn non_zero(mut self) -> Self {
+        self.non_zero = true;
+        self
+    }
 
     /// Configures a fallback default value used when this field is missing.
-    pub fn default(mut self, val: i64) -> Self { self.default = Some(val); self }
+    pub fn default(mut self, val: i64) -> Self {
+        self.default = Some(val);
+        self
+    }
 
     /// Configures the schema to strictly fail if the field is absent.
-    pub fn required(mut self) -> Self { self.required = true; self }
+    pub fn required(mut self) -> Self {
+        self.required = true;
+        self
+    }
 
     /// Registers the field as optional (permits `Null` values).
-    pub fn optional(mut self) -> Self { self.optional = true; self }
+    pub fn optional(mut self) -> Self {
+        self.optional = true;
+        self
+    }
 
     /// Opts into strict validation mode: non-integer inputs cause immediate failure instead of coercion.
-    pub fn strict(mut self) -> Self { self.strict = true; self }
+    pub fn strict(mut self) -> Self {
+        self.strict = true;
+        self
+    }
 
     fn build_chain(&self) -> ValidatorChain {
         let mut chain = ValidatorChain::new();
@@ -96,7 +124,9 @@ impl SchemaValidator for IntegerSchema {
         } else {
             value.clone()
         };
-        self.build_chain().validate(&effective, field).map_err(|e| e.errors[0].clone())
+        self.build_chain()
+            .validate(&effective, field)
+            .map_err(|e| e.errors[0].clone())
     }
 
     fn is_required(&self) -> bool {
@@ -107,7 +137,9 @@ impl SchemaValidator for IntegerSchema {
         self.default.map(Value::Int)
     }
 
-    fn schema_type(&self) -> &'static str { "integer" }
+    fn schema_type(&self) -> &'static str {
+        "integer"
+    }
 }
 
 #[cfg(test)]
@@ -186,4 +218,3 @@ mod tests {
         assert!(s.validate(&Value::Int(0), "val").is_err());
     }
 }
-

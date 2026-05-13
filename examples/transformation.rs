@@ -1,6 +1,6 @@
 //! Transformation example showcasing the Adapt trait, Pipeline, and FieldMapper.
 
-use adapters::{Adapt, Pipeline, FieldMapper, Value, Error};
+use adapters::{Adapt, Error, FieldMapper, Pipeline, Value};
 use std::collections::BTreeMap;
 
 struct Celsius(f64);

@@ -2,10 +2,10 @@
 //!
 //! Provides the [`BoolSchema`] structure for boolean validation constraints.
 
-use crate::error::ValidationError;
-use crate::value::Value;
-use crate::validator::{ValidatorChain, RequiredValidator, StrictTypeValidator};
 use super::SchemaValidator;
+use crate::error::ValidationError;
+use crate::validator::{RequiredValidator, StrictTypeValidator, ValidatorChain};
+use crate::value::Value;
 
 /// Schema representing boolean constraints and mapping metadata.
 #[derive(Default)]
@@ -18,19 +18,33 @@ pub struct BoolSchema {
 
 impl BoolSchema {
     /// Creates a new `BoolSchema` with no validation constraints.
-    pub fn new() -> Self { Default::default() }
+    pub fn new() -> Self {
+        Default::default()
+    }
 
     /// Configures a fallback default value used when this field is missing.
-    pub fn default(mut self, val: bool) -> Self { self.default = Some(val); self }
+    pub fn default(mut self, val: bool) -> Self {
+        self.default = Some(val);
+        self
+    }
 
     /// Configures the schema to strictly fail if the field is absent.
-    pub fn required(mut self) -> Self { self.required = true; self }
+    pub fn required(mut self) -> Self {
+        self.required = true;
+        self
+    }
 
     /// Registers the field as optional (permits `Null` values).
-    pub fn optional(mut self) -> Self { self.optional = true; self }
+    pub fn optional(mut self) -> Self {
+        self.optional = true;
+        self
+    }
 
     /// Opts into strict validation mode: non-boolean inputs cause immediate failure instead of coercion.
-    pub fn strict(mut self) -> Self { self.strict = true; self }
+    pub fn strict(mut self) -> Self {
+        self.strict = true;
+        self
+    }
 
     fn build_chain(&self) -> ValidatorChain {
         let mut chain = ValidatorChain::new();
@@ -62,7 +76,9 @@ impl SchemaValidator for BoolSchema {
         } else {
             value.clone()
         };
-        self.build_chain().validate(&effective, field).map_err(|e| e.errors[0].clone())
+        self.build_chain()
+            .validate(&effective, field)
+            .map_err(|e| e.errors[0].clone())
     }
 
     fn is_required(&self) -> bool {
@@ -73,7 +89,9 @@ impl SchemaValidator for BoolSchema {
         self.default.map(Value::Bool)
     }
 
-    fn schema_type(&self) -> &'static str { "bool" }
+    fn schema_type(&self) -> &'static str {
+        "bool"
+    }
 }
 
 #[cfg(test)]

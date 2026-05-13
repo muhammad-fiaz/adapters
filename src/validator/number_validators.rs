@@ -3,9 +3,9 @@
 //! Provides validation constraints specifically targeting numeric datatypes,
 //! including min/max limits, positive/negative bounds, non-zero checks, and range validations.
 
+use super::common_validators::ValidatorFn;
 use crate::error::ValidationError;
 use crate::value::Value;
-use super::common_validators::ValidatorFn;
 
 /// A validator enforcing that an integer value is greater than or equal to $N$.
 pub struct MinIntValidator(pub i64);
@@ -87,7 +87,11 @@ impl ValidatorFn for PositiveValidator {
         if let Some(f) = value.coerce_to_float()
             && f <= 0.0
         {
-            return Err(ValidationError::new(field, "value must be positive", "positive"));
+            return Err(ValidationError::new(
+                field,
+                "value must be positive",
+                "positive",
+            ));
         }
         Ok(())
     }
@@ -101,7 +105,11 @@ impl ValidatorFn for NegativeValidator {
         if let Some(f) = value.coerce_to_float()
             && f >= 0.0
         {
-            return Err(ValidationError::new(field, "value must be negative", "negative"));
+            return Err(ValidationError::new(
+                field,
+                "value must be negative",
+                "negative",
+            ));
         }
         Ok(())
     }
@@ -115,7 +123,11 @@ impl ValidatorFn for NonZeroValidator {
         if let Some(f) = value.coerce_to_float()
             && f == 0.0
         {
-            return Err(ValidationError::new(field, "value must not be zero", "non_zero"));
+            return Err(ValidationError::new(
+                field,
+                "value must not be zero",
+                "non_zero",
+            ));
         }
         Ok(())
     }
@@ -136,7 +148,10 @@ impl ValidatorFn for RangeValidator {
         {
             return Err(ValidationError::new(
                 field,
-                format!("value must be in range [{}, {}], got {f}", self.min, self.max),
+                format!(
+                    "value must be in range [{}, {}], got {f}",
+                    self.min, self.max
+                ),
                 "range",
             ));
         }
@@ -165,17 +180,29 @@ mod tests {
 
     #[test]
     fn test_max_int_fail() {
-        assert!(MaxIntValidator(100).validate(&Value::Int(200), "n").is_err());
+        assert!(
+            MaxIntValidator(100)
+                .validate(&Value::Int(200), "n")
+                .is_err()
+        );
     }
 
     #[test]
     fn test_min_float_fail() {
-        assert!(MinFloatValidator(1.0).validate(&Value::Float(0.5), "f").is_err());
+        assert!(
+            MinFloatValidator(1.0)
+                .validate(&Value::Float(0.5), "f")
+                .is_err()
+        );
     }
 
     #[test]
     fn test_max_float_fail() {
-        assert!(MaxFloatValidator(1.0).validate(&Value::Float(1.5), "f").is_err());
+        assert!(
+            MaxFloatValidator(1.0)
+                .validate(&Value::Float(1.5), "f")
+                .is_err()
+        );
     }
 
     #[test]
@@ -205,15 +232,25 @@ mod tests {
 
     #[test]
     fn test_range_pass() {
-        assert!(RangeValidator { min: 0.0, max: 100.0 }
+        assert!(
+            RangeValidator {
+                min: 0.0,
+                max: 100.0
+            }
             .validate(&Value::Int(50), "n")
-            .is_ok());
+            .is_ok()
+        );
     }
 
     #[test]
     fn test_range_fail() {
-        assert!(RangeValidator { min: 0.0, max: 10.0 }
+        assert!(
+            RangeValidator {
+                min: 0.0,
+                max: 10.0
+            }
             .validate(&Value::Int(11), "n")
-            .is_err());
+            .is_err()
+        );
     }
 }

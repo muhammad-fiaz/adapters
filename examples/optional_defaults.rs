@@ -1,7 +1,7 @@
 //! optional_defaults example — Option<T> fields and default values.
 
-use adapters_macros::Schema;
 use adapters::{Adapter, Validate};
+use adapters_macros::Schema;
 
 #[derive(Schema, Debug)]
 struct Profile {
@@ -17,12 +17,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("=== optional_defaults example ===\n");
 
     // All fields present
-    let full = Profile::from_json(r#"{
+    let full = Profile::from_json(
+        r#"{
         "name": "Alice",
         "bio": "Rust enthusiast",
         "country": "USA",
         "score": 42
-    }"#)?;
+    }"#,
+    )?;
     println!("Full: {:?}", full);
 
     // bio absent → None, country absent → default "India", score absent → default 0
