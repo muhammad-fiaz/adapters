@@ -48,6 +48,26 @@ impl Deserialize for String {
     }
 }
 
+impl Deserialize for char {
+    fn deserialize(value: Value) -> Result<Self, Error> {
+        match value {
+            Value::String(s) => {
+                let mut chars = s.chars();
+                if let (Some(c), None) = (chars.next(), chars.next()) {
+                    Ok(c)
+                } else {
+                    Err(DeserializationError::new("expected a single character string for char").into())
+                }
+            }
+            other => Err(DeserializationError::new(format!(
+                "expected string for char, got {}",
+                other.type_name()
+            ))
+            .into()),
+        }
+    }
+}
+
 impl Deserialize for f64 {
     fn deserialize(value: Value) -> Result<Self, Error> {
         match value {
@@ -139,6 +159,77 @@ impl Deserialize for u64 {
             Value::Float(f) if f.fract() == 0.0 && f >= 0.0 => Ok(f as u64),
             other => Err(DeserializationError::new(format!(
                 "expected integer, got {}",
+                other.type_name()
+            ))
+            .into()),
+        }
+    }
+}
+
+impl Deserialize for i128 {
+    fn deserialize(value: Value) -> Result<Self, Error> {
+        match value {
+            Value::Int(n) => Ok(n as i128),
+            Value::Float(f) if f.fract() == 0.0 => Ok(f as i128),
+            other => Err(DeserializationError::new(format!(
+                "expected integer, got {}",
+                other.type_name()
+            ))
+            .into()),
+        }
+    }
+}
+
+impl Deserialize for u128 {
+    fn deserialize(value: Value) -> Result<Self, Error> {
+        match value {
+            Value::Int(n) if n >= 0 => Ok(n as u128),
+            Value::Int(n) => Err(DeserializationError::new(format!("value {n} out of range for u128")).into()),
+            Value::Float(f) if f.fract() == 0.0 && f >= 0.0 => Ok(f as u128),
+            other => Err(DeserializationError::new(format!(
+                "expected integer, got {}",
+                other.type_name()
+            ))
+            .into()),
+        }
+    }
+}
+
+impl Deserialize for std::net::Ipv4Addr {
+    fn deserialize(value: Value) -> Result<Self, Error> {
+        match value {
+            Value::String(s) => s.parse::<std::net::Ipv4Addr>()
+                .map_err(|e| DeserializationError::new(format!("invalid IPv4 address: {}", e)).into()),
+            other => Err(DeserializationError::new(format!(
+                "expected string for IPv4 address, got {}",
+                other.type_name()
+            ))
+            .into()),
+        }
+    }
+}
+
+impl Deserialize for std::net::Ipv6Addr {
+    fn deserialize(value: Value) -> Result<Self, Error> {
+        match value {
+            Value::String(s) => s.parse::<std::net::Ipv6Addr>()
+                .map_err(|e| DeserializationError::new(format!("invalid IPv6 address: {}", e)).into()),
+            other => Err(DeserializationError::new(format!(
+                "expected string for IPv6 address, got {}",
+                other.type_name()
+            ))
+            .into()),
+        }
+    }
+}
+
+impl Deserialize for std::net::IpAddr {
+    fn deserialize(value: Value) -> Result<Self, Error> {
+        match value {
+            Value::String(s) => s.parse::<std::net::IpAddr>()
+                .map_err(|e| DeserializationError::new(format!("invalid IP address: {}", e)).into()),
+            other => Err(DeserializationError::new(format!(
+                "expected string for IP address, got {}",
                 other.type_name()
             ))
             .into()),
@@ -277,5 +368,31 @@ mod tests {
     #[test]
     fn test_u64_negative_fails() {
         assert!(u64::deserialize(Value::Int(-1)).is_err());
+    }
+
+    #[test]
+    fn test_new_types_deserialization() {
+        // char tests
+        assert_eq!(char::deserialize(Value::String("x".into())).unwrap(), 'x');
+        assert!(char::deserialize(Value::String("xy".into())).is_err());
+        assert!(char::deserialize(Value::Int(42)).is_err());
+
+        // i128 & u128 tests
+        assert_eq!(i128::deserialize(Value::Int(123456789)).unwrap(), 123456789i128);
+        assert_eq!(u128::deserialize(Value::Int(987654321)).unwrap(), 987654321u128);
+        assert!(u128::deserialize(Value::Int(-5)).is_err());
+
+        // IpAddress tests
+        let ip4 = std::net::Ipv4Addr::new(127, 0, 0, 1);
+        let ip6 = std::net::Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1);
+
+        assert_eq!(std::net::Ipv4Addr::deserialize(Value::String("127.0.0.1".into())).unwrap(), ip4);
+        assert!(std::net::Ipv4Addr::deserialize(Value::String("not-an-ip".into())).is_err());
+
+        assert_eq!(std::net::Ipv6Addr::deserialize(Value::String("::1".into())).unwrap(), ip6);
+        assert!(std::net::Ipv6Addr::deserialize(Value::String("not-an-ip".into())).is_err());
+
+        assert_eq!(std::net::IpAddr::deserialize(Value::String("127.0.0.1".into())).unwrap(), std::net::IpAddr::V4(ip4));
+        assert_eq!(std::net::IpAddr::deserialize(Value::String("::1".into())).unwrap(), std::net::IpAddr::V6(ip6));
     }
 }

@@ -33,6 +33,12 @@ impl Serialize for &str {
     }
 }
 
+impl Serialize for char {
+    fn serialize(&self) -> Value {
+        Value::String(self.to_string())
+    }
+}
+
 macro_rules! serialize_int {
     ($($t:ty),*) => {
         $(impl Serialize for $t {
@@ -40,7 +46,25 @@ macro_rules! serialize_int {
         })*
     };
 }
-serialize_int!(i8, i16, i32, i64, u8, u16, u32, u64, usize);
+serialize_int!(i8, i16, i32, i64, i128, u8, u16, u32, u64, u128, usize);
+
+impl Serialize for std::net::Ipv4Addr {
+    fn serialize(&self) -> Value {
+        Value::String(self.to_string())
+    }
+}
+
+impl Serialize for std::net::Ipv6Addr {
+    fn serialize(&self) -> Value {
+        Value::String(self.to_string())
+    }
+}
+
+impl Serialize for std::net::IpAddr {
+    fn serialize(&self) -> Value {
+        Value::String(self.to_string())
+    }
+}
 
 impl Serialize for f32 {
     fn serialize(&self) -> Value {
@@ -143,5 +167,18 @@ mod tests {
         m.insert("x".to_string(), 10i32);
         let v = m.serialize();
         assert_eq!(v.get("x"), Some(&Value::Int(10)));
+    }
+
+    #[test]
+    fn test_new_types_serialization() {
+        assert_eq!('a'.serialize(), Value::String("a".into()));
+        assert_eq!(12345i128.serialize(), Value::Int(12345));
+        assert_eq!(67890u128.serialize(), Value::Int(67890));
+
+        let ip4 = std::net::Ipv4Addr::new(127, 0, 0, 1);
+        assert_eq!(ip4.serialize(), Value::String("127.0.0.1".into()));
+
+        let ip6 = std::net::Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1);
+        assert_eq!(ip6.serialize(), Value::String("::1".into()));
     }
 }

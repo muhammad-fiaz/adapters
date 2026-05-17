@@ -14,7 +14,7 @@ The library is designed around three distinct, yet highly interconnected layers:
   Instead of validating data after parsing it into structured models (which can cause panics or silent errors on invalid types), Adapters defines a declarative, dynamic schema tree. Inbound payloads are verified at the dynamic level first, matching strict type names, number ranges, string lengths, custom regexes, and complex formats (e.g., Email or URLs).
 
 - **High-Performance Serialization & Deserialization**:
-  Adapters implements a zero-dependency serialization and deserialization model. Every primitive type, option, vector, and map is fully supported, allowing seamless, safe round-trips from dynamic values back into complex Rust structures.
+  Adapters implements a zero-dependency serialization and deserialization model. Every primitive type (including newly added `char`, `i128`, `u128`, and standard network addresses like `IpAddr`, `Ipv4Addr`, and `Ipv6Addr`), option, vector, and map is fully supported, allowing seamless, safe round-trips from dynamic values back into complex Rust structures.
 
 - **Functional Data Transformation**:
   Domain models often diverge between different contexts (e.g., Database Models vs. API Presentation Models). Using Pipeline and FieldMapper classes, you can map, rename, and transform data trees programmatically in a highly functional manner.
