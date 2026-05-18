@@ -191,7 +191,7 @@ mod tests {
     #[test]
     fn test_float_positive() {
         let s = FloatSchema::new().positive();
-        assert!(s.validate(&Value::Float(3.14), "val").is_ok());
+        assert!(s.validate(&Value::Float(3.15), "val").is_ok());
         assert!(s.validate(&Value::Float(0.0), "val").is_err());
         assert!(s.validate(&Value::Float(-1.5), "val").is_err());
     }
@@ -199,7 +199,7 @@ mod tests {
     #[test]
     fn test_float_negative() {
         let s = FloatSchema::new().negative();
-        assert!(s.validate(&Value::Float(-3.14), "val").is_ok());
+        assert!(s.validate(&Value::Float(-3.15), "val").is_ok());
         assert!(s.validate(&Value::Float(0.0), "val").is_err());
         assert!(s.validate(&Value::Float(1.5), "val").is_err());
     }
@@ -207,8 +207,8 @@ mod tests {
     #[test]
     fn test_float_non_zero() {
         let s = FloatSchema::new().non_zero();
-        assert!(s.validate(&Value::Float(3.14), "val").is_ok());
-        assert!(s.validate(&Value::Float(-3.14), "val").is_ok());
+        assert!(s.validate(&Value::Float(3.15), "val").is_ok());
+        assert!(s.validate(&Value::Float(-3.15), "val").is_ok());
         assert!(s.validate(&Value::Float(0.0), "val").is_err());
     }
 }
