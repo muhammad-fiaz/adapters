@@ -4,7 +4,7 @@
 
 use adapters::{
     Adapt, Adapter, ArraySchema, Error, FieldMapper, IntegerSchema, ObjectSchema, Pipeline, Schema,
-    SchemaValidator, StringSchema, ValidationError, Value,
+    SchemaValidator, StringSchema, Validate, ValidationError, Value,
     json::{parse, stringify, stringify_pretty},
 };
 use adapters_macros::Schema as SchemaDerived;
@@ -488,4 +488,83 @@ fn test_extra_macro_validations_fail_zero_nonzero() {
     }"#;
     let res = ExtraMacroFeatures::from_json(json);
     assert!(res.is_err());
+}
+
+// Custom validation function for macro test
+fn validate_even_number(value: &Value, field: &str) -> Result<(), Error> {
+    if let Some(n) = value.as_int() {
+        if n % 2 == 0 {
+            Ok(())
+        } else {
+            Err(Error::Validation(ValidationError::new(
+                field,
+                "must be an even number",
+                "even_number",
+            )))
+        }
+    } else {
+        Ok(())
+    }
+}
+
+#[derive(SchemaDerived, Debug)]
+struct CustomValidStruct {
+    #[schema(custom = validate_even_number)]
+    even_value: i32,
+}
+
+#[test]
+fn test_custom_macro_validator_success() {
+    let json = r#"{"even_value": 4}"#;
+    let res = CustomValidStruct::from_json(json);
+    assert!(res.is_ok(), "Deserialization should succeed");
+    let instance = res.unwrap();
+    assert!(instance.validate().is_ok(), "Expected even value to validate successfully");
+}
+
+#[test]
+fn test_custom_macro_validator_failure() {
+    let json = r#"{"even_value": 5}"#;
+    let res = CustomValidStruct::from_json(json);
+    assert!(res.is_ok(), "Deserialization should succeed");
+    let instance = res.unwrap();
+    assert!(instance.validate().is_err(), "Expected odd value to fail self-validation");
+}
+
+#[derive(SchemaDerived, Debug)]
+struct UrlVerifiedStruct {
+    #[schema(url)]
+    website: String,
+}
+
+#[test]
+fn test_url_macro_validator_success() {
+    let json = r#"{"website": "https://muhammadfiaz.com"}"#;
+    let res = UrlVerifiedStruct::from_json(json);
+    assert!(res.is_ok(), "Expected valid URL to validate successfully");
+}
+
+#[test]
+fn test_url_macro_validator_failure() {
+    let json = r#"{"website": "not-a-valid-url"}"#;
+    let res = UrlVerifiedStruct::from_json(json);
+    assert!(res.is_err(), "Expected invalid URL to fail validation");
+}
+
+#[test]
+fn test_programmatic_custom_validator_success() {
+    use adapters::validator::{CustomValidator, ValidatorFn};
+    let validator = CustomValidator {
+        func: Box::new(|val, field| {
+            if val.as_str() == Some("special-token") {
+                Ok(())
+            } else {
+                Err(ValidationError::new(field, "invalid special token", "token_mismatch"))
+            }
+        }),
+    };
+    let pass = Value::String("special-token".into());
+    let fail = Value::String("other-token".into());
+    assert!(validator.validate(&pass, "token").is_ok());
+    assert!(validator.validate(&fail, "token").is_err());
 }
