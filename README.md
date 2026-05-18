@@ -128,7 +128,7 @@ Add this directly to your `Cargo.toml` dependencies block:
 
 ```toml
 [dependencies]
-adapters = "0.1.0"
+adapters = "0.0.0"
 ```
 
 ---
