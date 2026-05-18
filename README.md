@@ -1,6 +1,6 @@
 <div align="center">
-<img width="500" height="500" alt="adapters-thumbnail" src="https://github.com/user-attachments/assets/6cf356a1-ea5f-406e-b738-b5e67a6aaab1" />
-  
+  <img alt="rust logo" src="https://github.com/user-attachments/assets/79881f0c-dbed-4e76-b347-40da3e3ecd97" />
+<h1>Adapters</h1>
 <a href="https://muhammad-fiaz.github.io/adapters/"><img src="https://img.shields.io/badge/docs-muhammad--fiaz.github.io-blue" alt="Documentation"></a>
 <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Rust-Edition%202024-orange.svg?logo=rust" alt="Rust Edition"></a>
 <a href="https://github.com/muhammad-fiaz/adapters"><img src="https://img.shields.io/github/stars/muhammad-fiaz/adapters" alt="GitHub stars"></a>
