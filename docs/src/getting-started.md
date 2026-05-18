@@ -4,14 +4,23 @@ Learn how to install, configure, and run your first schema validation and deseri
 
 ## Installation
 
-Add `adapters` to your Rust project's `Cargo.toml` as a dependency:
+### Method 1: Reference latest Git repository (Recommended)
+
+Since this project is under active development, referencing the official Git repository ensures you always have the latest performance improvements and features:
 
 ```toml
 [dependencies]
 adapters = { git = "https://github.com/muhammad-fiaz/adapters.git" }
 ```
 
-Since this project is in active development, referencing the Git repository ensures you have the latest performance updates and features.
+### Method 2: Manual Version Entry
+
+Alternatively, add `adapters` directly as a version dependency to your `Cargo.toml`:
+
+```toml
+[dependencies]
+adapters = "0.0.0"
+```
 
 ---
 
