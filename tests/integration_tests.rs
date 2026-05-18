@@ -519,7 +519,10 @@ fn test_custom_macro_validator_success() {
     let res = CustomValidStruct::from_json(json);
     assert!(res.is_ok(), "Deserialization should succeed");
     let instance = res.unwrap();
-    assert!(instance.validate().is_ok(), "Expected even value to validate successfully");
+    assert!(
+        instance.validate().is_ok(),
+        "Expected even value to validate successfully"
+    );
 }
 
 #[test]
@@ -528,7 +531,10 @@ fn test_custom_macro_validator_failure() {
     let res = CustomValidStruct::from_json(json);
     assert!(res.is_ok(), "Deserialization should succeed");
     let instance = res.unwrap();
-    assert!(instance.validate().is_err(), "Expected odd value to fail self-validation");
+    assert!(
+        instance.validate().is_err(),
+        "Expected odd value to fail self-validation"
+    );
 }
 
 #[derive(SchemaDerived, Debug)]
@@ -559,7 +565,11 @@ fn test_programmatic_custom_validator_success() {
             if val.as_str() == Some("special-token") {
                 Ok(())
             } else {
-                Err(ValidationError::new(field, "invalid special token", "token_mismatch"))
+                Err(ValidationError::new(
+                    field,
+                    "invalid special token",
+                    "token_mismatch",
+                ))
             }
         }),
     };
