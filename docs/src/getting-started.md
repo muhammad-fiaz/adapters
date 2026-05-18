@@ -43,7 +43,7 @@ fn main() -> Result<(), adapters::Error> {
     // 1. A valid JSON payload
     let json_data = r#"{
         "username": "supercoder",
-        "email": "contact@muhammadfiaz.com",
+        "email": "contact@example.com",
         "age": 28,
         "website": "https://muhammad-fiaz.github.io"
     }"#;

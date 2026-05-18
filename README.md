@@ -153,7 +153,7 @@ struct UserRegistration {
 fn main() -> Result<(), Error> {
     let raw_payload = r#"{
         "username": "Fiaz2026",
-        "email": "contact@muhammadfiaz.com",
+        "email": "contact@example.com",
         "age": 28
     }"#;
 
